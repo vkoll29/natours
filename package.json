@@ -1,0 +1,19 @@
+{
+  "name": "natours-app",
+  "version": "1.0.0",
+  "description": "learning node,  express and mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vkoll29/natours.git"
+  },
+  "author": "vkoll29",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vkoll29/natours/issues"
+  },
+  "homepage": "https://github.com/vkoll29/natours#readme"
+}
