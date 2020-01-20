@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/vkoll29/natours/issues"
   },
-  "homepage": "https://github.com/vkoll29/natours#readme"
+  "homepage": "https://github.com/vkoll29/natours#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
