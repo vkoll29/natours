@@ -1,21 +1,35 @@
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
 
+//MIDDLEWARES
+app.use(morgan('dev'));
 app.use(express.json());
-
+// app.use((req, res, next) => {
+//   console.log("this text is from the middleware");
+//   next();
+// })
+//
+// app.use((req, res, next) => {
+//   req.reqTime = new Date().toISOString();
+//   next();
+// })
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 
-app.get('/api/v1/tours', (req, res) => {
+//tour ROUTE HANDLERS
+
+const getAllTours = (req, res) => {
     res.status(200).json({
         status: "success",
+        time: req.reqTime,
         results: tours.length,
         data: { tours }
     });
-});
+}
 
-app.get('/api/v1/tours/:id/', (req, res) => {
+const getTour = (req, res) => {
     tourId = parseInt(req.params.id);
     /** first solution to a case where the ID doesn't match records*/
 
@@ -40,9 +54,9 @@ app.get('/api/v1/tours/:id/', (req, res) => {
             tour
         }
     })
-})
+}
 
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
     /**my implementation. works */
     // tours.push(req.body)
     // fs.writeFileSync(`${__dirname}/dev-data/data/tours-simple2.json`, JSON.stringify(tours));
@@ -57,9 +71,9 @@ app.post('/api/v1/tours', (req, res) => {
         })
     });
 
-});
+}
 
-app.patch('/api/v1/tours/:id', (req, res) => {
+const updateTour = (req, res) => {
   if(parseInt(req.params.id) > tours[tours.length - 1].id) return(
     res.status(404).json({
       status: "Failed",
@@ -70,9 +84,9 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     status: "success",
     message: "Successfully modified the tour with id..."
   })
-})
+};
 
-app.delete('/api/v1/tours/:id', (req, res) =>{
+const deleteTour = (req, res) =>{
   if(parseInt(req.params.id) > tours[tours.length - 1].id) return(
     res.status(404).json({
       status: "Failed",
@@ -83,8 +97,77 @@ app.delete('/api/v1/tours/:id', (req, res) =>{
     status: "success",
     data: null
   })
-})
+};
 
+//user route HANDLERS
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server error"
+  })
+}
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server error"
+  })
+}
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server error"
+  })
+}
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server error"
+  })
+}
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server error"
+  })
+}
+
+
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id/', getTour)
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+//ROUTES
+const tourRouter = express.Router();
+
+
+const userRouter = express.Router();
+
+tourRouter
+  .route('/')
+  .get(getAllTours)
+  .post(createTour);
+tourRouter
+  .route('/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
+
+userRouter
+  .route('/')
+  .get(getAllUsers)
+  .post(createUser);
+userRouter
+  .route('/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
+
+
+//START SERVER
 const port = 4000;
 app.listen(port, () => {
     console.log(`server running on port ${port}`);
