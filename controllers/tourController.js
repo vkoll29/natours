@@ -16,7 +16,7 @@ exports.checkData = (req, res, next) => {
   if(!req.body.name || !req.body.price) return(
     res.status(400).json({
       status: "Failed",
-      message: "Bad request: You must include the new data"
+      message: "Bad request: You must include all the new data"
     })
   )
   next();
