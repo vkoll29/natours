@@ -5,7 +5,31 @@ const Tour = require('./../models/tourModel');
 //tour ROUTE HANDLERS
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    //BUILD QUERY
+    //Filtering
+    let queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach(e => delete queryObj[e]);
+    // console.log(req.query, queryObj);
+
+    // const tours = Tour.find()
+    //   .where('duration')
+    //   .gte(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+
+    //Advanced filtering
+
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    queryObj = JSON.parse(queryStr);
+    //{duration: {$gte: 5}, difficulty: easy}
+    const query = Tour.find(queryObj);
+
+    //EXECUTE QUERY
+    const tours = await query;
+
+    //SEND RESPONSE
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -14,7 +38,7 @@ exports.getAllTours = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: 'failed for some reason'
+      message: err.message
     });
   }
 };
