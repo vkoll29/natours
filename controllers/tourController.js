@@ -2,6 +2,13 @@
 /* eslint-disable no-console */
 const Tour = require('./../models/tourModel');
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
+
 //tour ROUTE HANDLERS
 exports.getAllTours = async (req, res) => {
   try {
@@ -34,9 +41,26 @@ exports.getAllTours = async (req, res) => {
     } else {
       query = query.sort('-createdAt');
     }
+    //3) Limiting fields shown after a query
+    if (req.query.fields) {
+      const projectedFields = req.query.fields.split(',').join(' ');
+      query = query.select(projectedFields);
+    } else {
+      query = query.select('-__v');
+    }
+    //4 Pagination
+    const page = req.query.page * 1 || 1; //another way of converting a string to number, the or operator defines a default value for page
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exist');
+    }
 
     //EXECUTE QUERY
     const tours = await query;
+    //query.sort().select().skip().limit() - this is what's happening in the above line i.e when the query is finally executed
 
     //SEND RESPONSE
     res.status(200).json({
