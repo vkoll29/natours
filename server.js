@@ -16,8 +16,8 @@ mongoose
     useCreateIndex: true,
     useFindAndModify: false
   })
-  .then(con => {
-    console.log(con.connections);
+  .then(() => {
+    // console.log(con.connections);
     console.log('Connected to database successfully');
   });
 //connect method is a promise. con used as an arg in then is the resolved value of the promise
