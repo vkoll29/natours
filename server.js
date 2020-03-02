@@ -14,11 +14,16 @@ mongoose
   .connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useUnifiedTopology: true
   })
   .then(() => {
     // console.log(con.connections);
     console.log('Connected to database successfully');
+  })
+  .catch(err => {
+    console.log(`DB ERROR: ${err.message}`);
+    process.exit(-1);
   });
 //connect method is a promise. con used as an arg in then is the resolved value of the promise
 
