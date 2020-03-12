@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'A password is required to create a user account'],
-    minlength: 8
+    minlength: 8,
+    select: false
   },
   passwordConfirm: {
     type: String,
@@ -39,7 +40,7 @@ const userSchema = new mongoose.Schema({
 });
 
 //pre(save) is called just when the data is received from the user and just before it is persisted in the db
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function(next) {
   //do not encrypt password if it is not modified
   if (!this.isModified('password')) return next();
 
@@ -50,6 +51,13 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
+
+userSchema.methods.correctPassword = async function(
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
