@@ -36,7 +36,8 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Ensure that the passwords match'
     }
-  }
+  },
+  passwordChangedAt: Date
 });
 
 //pre(save) is called just when the data is received from the user and just before it is persisted in the db
@@ -57,6 +58,20 @@ userSchema.methods.correctPassword = async function(
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+//By default this function should return false meaning that the password has never been changed
+//However, if it has a passwordChangedAt property, then it should be compared with the date of issue of the token issued
+//If the password was changed after the token was issued then render that token invalid and require new login
+//An example is changing your password for twitter on one device then trying to access twitter on another device. you will be asked to log in again
+userSchema.methods.changedPasswordAfterLogin = function(JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedAt = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    return changedAt > JWTTimestamp;
+  }
+
+  // Password has not been changed
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);

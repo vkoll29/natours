@@ -1,6 +1,5 @@
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
 
 //user route HANDLERS
 exports.getAllUsers = catchAsync(async (req, res) => {

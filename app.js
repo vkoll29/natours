@@ -20,11 +20,11 @@ app.use(express.static(`${__dirname}/public`));
 //   next();
 // })
 //
-app.use((req, res, next) => {
-  req.reqTime = new Date().toISOString();
-  console.log(req.headers);
-  next();
-});
+// app.use((req, res, next) => {
+//   req.reqTime = new Date().toISOString();
+//   console.log(req.headers);
+//   next();
+// });
 
 // route middlewares
 app.use('/api/v1/tours', tourRouter);
