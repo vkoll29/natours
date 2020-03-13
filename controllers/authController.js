@@ -23,7 +23,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     token,
     data: newUser
   });
-  next();
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -47,4 +46,25 @@ exports.login = catchAsync(async (req, res, next) => {
     status: 'success',
     token
   });
+});
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1. Get token and check if it is there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+  console.log(token);
+  if (!token) {
+    return next(new AppError('You must be logged in to view this page', 401));
+  }
+  // 2. Verification token
+
+  //3. Check if user still exists
+
+  //4. Check if user changed password after token was issued
+  next();
 });
