@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -42,7 +43,9 @@ const userSchema = new mongoose.Schema({
       message: 'Ensure that the passwords match'
     }
   },
-  passwordChangedAt: Date
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  resetTokenExpires: Date
 });
 
 //pre(save) is called just when the data is received from the user and just before it is persisted in the db
@@ -55,6 +58,12 @@ userSchema.pre('save', async function(next) {
   //passwordConfirm is unimportant in the database so the field is deleted. only used to confirm that the user typed the right thing
   this.passwordConfirm = undefined;
 
+  next();
+});
+
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000; //sometimes the data may be slower to save thus the jwt migh tbe set earlier than passchangedafter. subtract 1 second to put it a bit ealier just to be safe
   next();
 });
 
@@ -77,6 +86,17 @@ userSchema.methods.changedPasswordAfterLogin = function(JWTTimestamp) {
 
   // Password has not been changed
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  console.log({ resetToken }, { pwt: this.passwordResetToken });
+  this.resetTokenExpires = Date.now() + 10 * 60 * 1000;
+  return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);
