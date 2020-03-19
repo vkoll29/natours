@@ -45,7 +45,12 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  resetTokenExpires: Date
+  resetTokenExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
 });
 
 //pre(save) is called just when the data is received from the user and just before it is persisted in the db
@@ -64,6 +69,11 @@ userSchema.pre('save', async function(next) {
 userSchema.pre('save', function(next) {
   if (!this.isModified('password') || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000; //sometimes the data may be slower to save thus the jwt migh tbe set earlier than passchangedafter. subtract 1 second to put it a bit ealier just to be safe
+  next();
+});
+userSchema.pre(/^find/, function(next) {
+  //this. refers to the current query
+  this.find({ active: { $ne: false } }); //using $ne:fasle because some documents don't have the active property set
   next();
 });
 
