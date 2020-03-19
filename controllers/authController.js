@@ -12,6 +12,17 @@ const signToken = id => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user
+    }
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -22,13 +33,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: newUser
-  });
+  //log user in and send token
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -45,14 +51,8 @@ exports.login = catchAsync(async (req, res, next) => {
       new AppError('The user email and password combination is incorrect', 400)
     );
   }
-  //3. send token
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-    message: `${user.name} is logged in`
-  });
+  //3. log user in and send token
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -168,13 +168,28 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //3. update the changedPasswordAt property for current user
   //this has been done directly on the userSchema using a presave middleware
 
-  //4. Log user in
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-    message: `${user.name}'s password has been changed successfully and is logged in`
-  });
+  //4. log user in and send token
+  createSendToken(user, 200, res);
 });
 
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  //1. Get user from collection
+  const user = await User.findById(req.user.id).select('+password');
+
+  console.log(user);
+
+  //2. Ask user to confirm his current password before modifying it
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(
+      new AppError('Your have typed the wrong current password', 401)
+    );
+  }
+
+  //3. If current password is correct, update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  //4.Log user in, send jwt
+  createSendToken(user, 200, res);
+});
