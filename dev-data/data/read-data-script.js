@@ -16,9 +16,7 @@ mongoose
   .then(() => console.log('connected to db successfylly'));
 
 //READ FILE
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
 //IMPORT DATA INTO DB
 // eslint-disable-next-line no-unused-vars

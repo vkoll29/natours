@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+// const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -78,7 +79,35 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String
+      }
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   {
     toJSON: {
@@ -100,13 +129,41 @@ tourSchema.pre('save', function(next) {
   next();
 });
 
-// query middleware
+/*
+//embedding users into tours
+tourSchema.pre('save', async function(next) {
+  //1. loop through the array of guides from req.body,
+  //2. get the users whose ids are in req. this is an async fn and returns a promise hence an array of promises
+  //3. run all the promises at the same time and save to this document's guides property
+  const guidesPromises = this.guides.map(async id => await User.findById(id));
+  this.guides = await Promise.all(guidesPromises);
+  next();
+});
+*/
+// QUERY MIDDLEWARE
+// Ignore secret tours from query results
 tourSchema.pre(/^find/, function(next) {
   this.find({
     secretTour: {
       $ne: true
     }
-  }); // this refers to the query object
+  }); // the this variable refers to the query object
+  this.start = Date.now();
+  next();
+});
+
+// populate guides info into query results
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt'
+  });
+  next();
+});
+
+//log the amount of time a query took to execute
+tourSchema.post(/^find/, function(docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
   next();
 });
 
