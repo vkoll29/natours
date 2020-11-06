@@ -4,56 +4,50 @@ class APIFeatures {
     this.queryString = queryString;
   }
 
-  //BUILD QUERY
-
   filter() {
-    //1a) Filtering
-    let queryObj = { ...this.queryString }; //using destructuring because if assigned directly it will modify the actual object. objects only hold reference to memory not the actual data
+    const queryObj = { ...this.queryString };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach(e => delete queryObj[e]);
+    excludedFields.forEach(el => delete queryObj[el]);
 
-    //1b) Advanced filtering
+    // 1B) Advanced filtering
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-    queryObj = JSON.parse(queryStr);
-    //{duration: {$gte: 5}, difficulty: easy}
-    this.query = this.query.find(queryObj); // find() returns a query
+
+    this.query = this.query.find(JSON.parse(queryStr));
+
     return this;
   }
 
   sort() {
-    //2. Sorting
     if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' '); // e.g sort('ratingsAverage price')
+      const sortBy = this.queryString.sort.split(',').join(' ');
       this.query = this.query.sort(sortBy);
     } else {
       this.query = this.query.sort('-createdAt');
     }
+
     return this;
   }
 
   limitFields() {
     if (this.queryString.fields) {
-      const projectedFields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(projectedFields);
+      const fields = this.queryString.fields.split(',').join(' ');
+      this.query = this.query.select(fields);
     } else {
       this.query = this.query.select('-__v');
     }
+
     return this;
   }
 
   paginate() {
-    const page = this.queryString.page * 1 || 1; //another way of converting a string to number, the or operator defines a default value for page
+    const page = this.queryString.page * 1 || 1;
     const limit = this.queryString.limit * 1 || 100;
     const skip = (page - 1) * limit;
+
     this.query = this.query.skip(skip).limit(limit);
+
     return this;
-    //if user requests a page beyond the available data
-    // if (this.queryString.page) {
-    //   const numTours = await Tour.countDocuments();
-    //   if (skip >= numTours) throw new Error('This page does not exist');
-    // }
   }
 }
-
 module.exports = APIFeatures;
