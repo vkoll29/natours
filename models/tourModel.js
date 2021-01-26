@@ -103,6 +103,12 @@ const tourSchema = new mongoose.Schema(
         description: String,
         day: Number
       }
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
     ]
   },
   {
@@ -132,6 +138,14 @@ tourSchema.pre(/^find/, function(next) {
       $ne: true
     }
   }); // this refers to the query object
+  next();
+});
+
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    'path': 'guides',
+    'select': '-__v -passwordChangedAt'
+  });
   next();
 });
 
