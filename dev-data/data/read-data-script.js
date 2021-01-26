@@ -5,7 +5,10 @@ const dotenv = require('dotenv');
 const Tour = require('./../../models/tourModel');
 
 dotenv.config({ path: './config.env' });
-const DB = process.env.DATABASE_LOCAL;
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
 
 mongoose
   .connect(DB, {
@@ -13,7 +16,7 @@ mongoose
     useCreateIndex: true,
     useFindAndModify: false
   })
-  .then(() => console.log('connected to db successfylly'));
+  .then(() => console.log('connected to db successfully'));
 
 //READ FILE
 const tours = JSON.parse(
