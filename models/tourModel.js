@@ -143,7 +143,9 @@ tourSchema.pre(/^find/, function(next) {
 
 tourSchema.pre(/^find/, function(next) {
   this.populate({
+    // eslint-disable-next-line prettier/prettier
     'path': 'guides',
+    // eslint-disable-next-line prettier/prettier
     'select': '-__v -passwordChangedAt'
   });
   next();

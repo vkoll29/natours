@@ -36,6 +36,24 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+// reviewSchema.pre(/^find/, function(next) {
+//   this.populate(
+//     'tour',
+//     'name'
+//     // {
+//     // // eslint-disable-next-line prettier/prettier
+//     // 'path': 'tour',
+//     // // eslint-disable-next-line prettier/prettier
+//     // // 'select': '-__v -passwordChangedAt',
+//     // project: { name: 1, summary: 1 }
+//     // }
+//   ).populate(
+//     'user',
+//     'name'
+//   );
+//   next();
+// });
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
