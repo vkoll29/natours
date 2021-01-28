@@ -100,6 +100,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
   // only after all the above checks are passed do you grant access to protected route
+  //the req.user can be accessed by other api calls as seen in createReview
   req.user = freshUser;
   next();
 });
