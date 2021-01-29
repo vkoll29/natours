@@ -13,6 +13,10 @@ const filterobj = (obj, ...allowedFields) => {
 };
 
 //user route HANDLERS
+exports.getMe = catchAsync(async (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+});
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   //1. Create error if user POSTS password
