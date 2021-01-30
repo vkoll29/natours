@@ -7,10 +7,11 @@ const Review = require('./../../models/reviewModel');
 const User = require('./../../models/userModel');
 
 dotenv.config({ path: './config.env' });
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const DB = process.env.DATABASE_LOCAL;
+// const DB = process.env.DATABASE.replace(
+//   '<PASSWORD>',
+//   process.env.DATABASE_PASSWORD
+// );
 
 mongoose
   .connect(DB, {
@@ -30,9 +31,9 @@ const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
 // eslint-disable-next-line no-unused-vars
 const importData = async () => {
   try {
-    await Tour.create(tours);
+    // await Tour.create(tours);
     await User.create(users, { validateBeforeSave: false });
-    await Review.create(reviews);
+    // await Review.create(reviews);
     console.log('data imported successfully');
   } catch (err) {
     console.log(err.message);
@@ -44,9 +45,9 @@ const importData = async () => {
 // eslint-disable-next-line no-unused-vars
 const deleteData = async () => {
   try {
-    await Tour.deleteMany();
+    // await Tour.deleteMany();
     await User.deleteMany();
-    await Review.deleteMany();
+    // await Review.deleteMany();
     console.log('data deleted successfully');
   } catch (err) {
     console.log(err.message);

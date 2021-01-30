@@ -11,11 +11,11 @@ process.on('uncaughtException', err => {
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-); /*Atlas server connection*/
-// const DB = process.env.DATABASE_LOCAL; /*local server connection*/
+// const DB = process.env.DATABASE.replace(
+//   '<PASSWORD>',
+//   process.env.DATABASE_PASSWORD
+// ); /*Atlas server connection*/
+const DB = process.env.DATABASE_LOCAL; /*local server connection*/
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
