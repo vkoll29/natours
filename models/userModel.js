@@ -71,6 +71,7 @@ userSchema.pre('save', function(next) {
   this.passwordChangedAt = Date.now() - 1000; //sometimes the data may be slower to save thus the jwt migh tbe set earlier than passchangedafter. subtract 1 second to put it a bit ealier just to be safe
   next();
 });
+
 userSchema.pre(/^find/, function(next) {
   //this. refers to the current query
   this.find({ active: { $ne: false } }); //using $ne:fasle because some documents don't have the active property set
