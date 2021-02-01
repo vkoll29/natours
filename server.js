@@ -11,11 +11,11 @@ process.on('uncaughtException', err => {
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
-// const DB = process.env.DATABASE.replace(
-//   '<PASSWORD>',
-//   process.env.DATABASE_PASSWORD
-// ); /*Atlas server connection*/
-const DB = process.env.DATABASE_LOCAL; /*local server connection*/
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+); /*Atlas server connection*/
+// const DB = process.env.DATABASE_LOCAL; /*local server connection*/
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
@@ -25,7 +25,7 @@ mongoose
   })
   .then(() => {
     // console.log(con.connections);
-    console.log('Connected to database successfully');
+    console.log('Connected to database successfully', process.env.DATABASE);
   });
 //connect method is a promise. con used as an arg in then() as the resolved value of the promise
 
